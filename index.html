@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0e0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>9X PANEL - Telegram Channel</title>
+  <meta name="description" content="Join 9X PANEL on Telegram. Earn With Dominators | VIP Signals. Baccarat Tips & Strategy.">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="assets/profile.jpg">
+
+  <!-- Google Font for Heading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ======================================================================
+       0. MOBILE NUMBER GATE SCREEN
+       User enters their mobile number and clicks Proceed to open the page.
+       ====================================================================== -->
+  <div id="gateScreen" class="gate-screen">
+    <div class="gate-card">
+      <div class="gate-avatar-wrap">
+        <img
+          src="assets/profile.jpg"
+          alt="9X PANEL"
+          class="gate-avatar"
+          width="76"
+          height="76"
+          loading="eager"
+        >
+      </div>
+
+      <h1 class="gate-title">9X PANEL</h1>
+      <p class="gate-subtitle">Enter your mobile number to continue and access our VIP channel.</p>
+
+      <form id="mobileGateForm" class="gate-form" novalidate>
+        <label for="mobileInput" class="gate-label">Mobile Number</label>
+        <div id="phoneInputGroup" class="phone-input-group">
+          <select id="countryCode" class="country-code-select" aria-label="Country code">
+            <option value="+91" selected>+91</option>
+            <option value="+1">+1</option>
+            <option value="+44">+44</option>
+            <option value="+971">+971</option>
+            <option value="+92">+92</option>
+            <option value="+880">+880</option>
+            <option value="+977">+977</option>
+          </select>
+          <input
+            id="mobileInput"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel-national"
+            class="phone-input"
+            placeholder="Enter 10-digit number"
+            maxlength="15"
+            required
+          >
+        </div>
+
+        <p id="gateError" class="gate-error" role="alert"></p>
+
+        <button id="proceedBtn" type="submit" class="btn-proceed">
+          PROCEED &rarr;
+        </button>
+      </form>
+
+      <p class="gate-disclaimer">It's only for entainment purpose I will not engage in any financial losses.</p>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       1. TIMER SCREEN (1.5-SECOND COUNTDOWN)
+       Displays photo, bold heading, 1.5s countdown, and disclaimer.
+       Starts after user submits mobile number.
+       ====================================================================== -->
+  <div id="timerScreen" class="timer-screen screen-hidden" role="status" aria-live="polite">
+    <div class="timer-card" id="timerCard">
+      <div class="timer-avatar-container">
+        <img 
+          src="assets/profile.jpg" 
+          alt="9X PANEL" 
+          class="timer-avatar" 
+          width="74" 
+          height="74"
+          loading="eager"
+        >
+        <svg class="timer-svg" viewBox="0 0 100 100" aria-hidden="true">
+          <circle class="timer-svg-bg" cx="50" cy="50" r="44"></circle>
+          <circle id="timerSvgCircle" class="timer-svg-bar" cx="50" cy="50" r="44"></circle>
+        </svg>
+      </div>
+
+      <!-- Bold Text -->
+      <h2 class="timer-bold-title">JOIN OUR PROFITABLE CHANNEL NOW</h2>
+
+      <!-- Countdown Box -->
+      <div class="timer-countdown-box">
+        <span id="countdownNumber" class="countdown-digit">1</span>
+      </div>
+
+      <p class="timer-subtext">Opening page in <span id="timerSecondsText">1.5</span> seconds...</p>
+
+      <div class="timer-progress-track">
+        <div id="timerProgressBar" class="timer-progress-fill"></div>
+      </div>
+
+      <!-- Small Disclaimer Text -->
+      <p class="timer-disclaimer">It's only for entainment purpose I will not engage in any financial losses.</p>
+
+      <button id="skipTimerBtn" class="timer-skip-btn" type="button" aria-label="Skip timer and open immediately">
+        Skip &rarr;
+      </button>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       2. FULLSCREEN VIDEO SCREEN (COVERS ENTIRE SCREEN AFTER TIMER)
+       Plays automatically with sound enabled. Overlaid with Telegram CTA & channel info.
+       ====================================================================== -->
+  <main id="videoScreen" class="fullscreen-video-container video-screen-hidden">
+
+    <!-- Fullscreen Video Covering 100% of the Screen -->
+    <video 
+      id="promoVideo" 
+      class="fullscreen-video" 
+      src="assets/video.mp4" 
+      playsinline 
+      webkit-playsinline
+      x5-playsinline
+      x5-video-player-type="h5-page"
+      x5-video-player-fullscreen="true"
+      disablePictureInPicture
+      controlsList="nodownload noplaybackrate nofullscreen"
+      preload="auto"
+    ></video>
+
+    <!-- Tap Area Over Video to ensure unmuting on tap without unwanted redirect -->
+    <div id="videoTapOverlay" class="video-tap-overlay" aria-label="Tap to unmute sound"></div>
+
+    <!-- Floating Sound Status Indicator (Only appears if browser blocks initial sound before touch) -->
+    <div id="soundIndicator" class="sound-indicator" style="display: none;">
+      <span class="sound-indicator-icon">🔊</span>
+      <span class="sound-indicator-text">Tap anywhere for sound</span>
+    </div>
+
+    <!-- Top Floating Telegram Header Overlay -->
+    <header class="video-top-overlay">
+      <a href="https://t.me/+heJeE9vRiXI5NmU1" class="video-channel-pill" target="_blank" rel="noopener noreferrer">
+        <img 
+          src="assets/profile.jpg" 
+          alt="9X PANEL" 
+          class="video-header-avatar"
+          width="42"
+          height="42"
+        >
+        <div class="video-header-meta">
+          <span class="video-header-title">9X PANEL</span>
+          <span class="video-header-subs">41 288 subscribers &bull; VIP Signals</span>
+        </div>
+      </a>
+    </header>
+
+    <!-- Bottom Floating CTA Overlay -->
+    <div class="video-bottom-overlay">
+      <a 
+        id="joinChannelBtn"
+        href="https://t.me/+heJeE9vRiXI5NmU1" 
+        class="btn-join" 
+        target="_blank" 
+        rel="noopener noreferrer"
+      >
+        JOIN CHANNEL
+      </a>
+
+      <p class="video-disclaimer">It's only for entainment purpose I will not engage in any financial losses.</p>
+    </div>
+
+  </main>
+
+  <!-- ======================================================================
+       AUTOMATION SCRIPT:
+       0. Mobile number gate validation & persistent storage (/api/save-number + localStorage backup)
+       1. 1.5-second countdown timer (starts after Proceed)
+       2. Robust audio unlock & unmuted video playback
+       3. Fullscreen video covering entire screen
+       4. Auto-redirect on video completion to Telegram link
+       5. Direct navigation on JOIN CHANNEL button
+       ====================================================================== -->
+  <script>
+    const COUNTDOWN_SECONDS = 1.5;
+    const TELEGRAM_URL = 'https://t.me/+heJeE9vRiXI5NmU1';
+    const SAVE_API_URL = '/api/save-number';
+
+    (function() {
+      const gateScreen = document.getElementById('gateScreen');
+      const mobileGateForm = document.getElementById('mobileGateForm');
+      const countryCodeSelect = document.getElementById('countryCode');
+      const mobileInput = document.getElementById('mobileInput');
+      const phoneInputGroup = document.getElementById('phoneInputGroup');
+      const gateError = document.getElementById('gateError');
+      const proceedBtn = document.getElementById('proceedBtn');
+
+      const timerScreen = document.getElementById('timerScreen');
+      const videoScreen = document.getElementById('videoScreen');
+      const promoVideo = document.getElementById('promoVideo');
+      const videoTapOverlay = document.getElementById('videoTapOverlay');
+      const soundIndicator = document.getElementById('soundIndicator');
+      const countdownNumber = document.getElementById('countdownNumber');
+      const timerSecondsText = document.getElementById('timerSecondsText');
+      const timerProgressBar = document.getElementById('timerProgressBar');
+      const timerSvgCircle = document.getElementById('timerSvgCircle');
+      const skipBtn = document.getElementById('skipTimerBtn');
+
+      let hasOpened = false;
+      let timerStarted = false;
+      let audioUnlocked = false;
+      const circumference = 2 * Math.PI * 44;
+
+      if (timerSvgCircle) {
+        timerSvgCircle.style.strokeDasharray = circumference;
+        timerSvgCircle.style.strokeDashoffset = '0';
+      }
+
+      // Clean input to digits only as user types
+      if (mobileInput) {
+        mobileInput.addEventListener('input', function() {
+          this.value = this.value.replace(/\D/g, '');
+          clearGateError();
+        });
+      }
+
+      function showGateError(msg) {
+        if (gateError) {
+          gateError.textContent = msg;
+          gateError.classList.add('visible');
+        }
+        if (phoneInputGroup) {
+          phoneInputGroup.classList.add('has-error');
+        }
+      }
+
+      function clearGateError() {
+        if (gateError) {
+          gateError.textContent = '';
+          gateError.classList.remove('visible');
+        }
+        if (phoneInputGroup) {
+          phoneInputGroup.classList.remove('has-error');
+        }
+      }
+
+      function validateMobileNumber(code, digits) {
+        if (!digits) {
+          return 'Please enter your mobile number.';
+        }
+        if (code === '+91') {
+          if (!/^[6-9]\d{9}$/.test(digits)) {
+            return 'Please enter a valid 10-digit Indian mobile number.';
+          }
+          return null;
+        }
+        if (digits.length < 7 || digits.length > 15) {
+          return 'Please enter a valid mobile number (7 to 15 digits).';
+        }
+        return null;
+      }
+
+      function saveToLocalBackup(entry) {
+        try {
+          const existing = JSON.parse(localStorage.getItem('collected_mobile_numbers') || '[]');
+          existing.push(entry);
+          localStorage.setItem('collected_mobile_numbers', JSON.stringify(existing));
+        } catch (err) {
+          console.warn('Local backup storage failed:', err);
+        }
+      }
+
+      async function storeMobileNumber(countryCode, number) {
+        const payload = {
+          countryCode: countryCode,
+          number: number,
+          fullNumber: countryCode + number,
+          submittedAt: new Date().toISOString()
+        };
+
+        saveToLocalBackup(payload);
+
+        for (var attempt = 1; attempt <= 2; attempt++) {
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(function() { controller.abort(); }, 10000);
+            const response = await fetch(SAVE_API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+              keepalive: true,
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            if (response.ok) return true;
+          } catch (err) {
+            console.warn('Backend save attempt ' + attempt + ' failed:', err);
+          }
+        }
+        return false;
+      }
+
+      // Master audio unlock function
+      function enableAudioPlayback() {
+        if (!promoVideo) return;
+        promoVideo.muted = false;
+        promoVideo.volume = 1.0;
+        audioUnlocked = true;
+
+        if (soundIndicator) {
+          soundIndicator.style.display = 'none';
+        }
+
+        // Only play if video screen is already open; otherwise just prime load
+        if (hasOpened) {
+          const p = promoVideo.play();
+          if (p !== undefined) {
+            p.catch(function(err) {
+              console.log('Audio play attempt:', err);
+            });
+          }
+        } else {
+          promoVideo.load();
+        }
+      }
+
+      function startVideo() {
+        if (!promoVideo) return;
+
+        // Try playing unmuted first
+        promoVideo.muted = false;
+        promoVideo.volume = 1.0;
+
+        const playPromise = promoVideo.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            audioUnlocked = true;
+            if (soundIndicator) soundIndicator.style.display = 'none';
+          }).catch(function() {
+            // Autoplay with audio was restricted by browser policy before user interaction
+            promoVideo.muted = true;
+            promoVideo.play().catch(function() {});
+
+            // Display sound indicator so user knows to tap
+            if (soundIndicator && !audioUnlocked) {
+              soundIndicator.style.display = 'inline-flex';
+            }
+          });
+        }
+
+        // Tapping the video screen or overlay un-mutes immediately without navigating away
+        function tapToUnmute(e) {
+          if (promoVideo.muted || !audioUnlocked) {
+            e.stopPropagation();
+            enableAudioPlayback();
+          }
+        }
+
+        if (videoTapOverlay) {
+          videoTapOverlay.addEventListener('click', tapToUnmute);
+          videoTapOverlay.addEventListener('touchstart', tapToUnmute, { passive: true });
+        }
+
+        if (soundIndicator) {
+          soundIndicator.addEventListener('click', tapToUnmute);
+          soundIndicator.addEventListener('touchstart', tapToUnmute, { passive: true });
+        }
+
+        promoVideo.addEventListener('click', tapToUnmute);
+        promoVideo.addEventListener('touchstart', tapToUnmute, { passive: true });
+
+        // Redirect to Telegram when video ends
+        promoVideo.addEventListener('ended', function() {
+          window.location.href = TELEGRAM_URL;
+        });
+      }
+
+      function openFullscreenVideo() {
+        if (hasOpened) return;
+        hasOpened = true;
+
+        if (timerScreen) {
+          timerScreen.classList.add('fade-out');
+          setTimeout(function() {
+            timerScreen.style.display = 'none';
+          }, 350);
+        }
+
+        if (videoScreen) {
+          videoScreen.classList.remove('video-screen-hidden');
+          videoScreen.classList.add('video-screen-visible');
+        }
+
+        startVideo();
+      }
+
+      function startCountdownSequence() {
+        if (timerStarted) return;
+        timerStarted = true;
+
+        if (timerScreen) {
+          timerScreen.classList.remove('screen-hidden');
+        }
+
+        // Start circular SVG ring and progress bar animations for 1.5 seconds
+        requestAnimationFrame(function() {
+          if (timerProgressBar) {
+            timerProgressBar.style.transition = 'width ' + COUNTDOWN_SECONDS + 's linear';
+            timerProgressBar.style.width = '100%';
+          }
+
+          if (timerSvgCircle) {
+            timerSvgCircle.style.transition = 'stroke-dashoffset ' + COUNTDOWN_SECONDS + 's linear';
+            timerSvgCircle.style.strokeDashoffset = circumference;
+          }
+        });
+
+        // 1.5-second countdown logic
+        const startTime = Date.now();
+        const durationMs = COUNTDOWN_SECONDS * 1000;
+
+        const interval = setInterval(function() {
+          const elapsed = Date.now() - startTime;
+          const leftSec = Math.max(0, (durationMs - elapsed) / 1000);
+
+          if (leftSec > 0.05) {
+            if (countdownNumber) {
+              const displayVal = Math.ceil(leftSec);
+              if (countdownNumber.textContent !== String(displayVal)) {
+                countdownNumber.textContent = displayVal;
+                countdownNumber.classList.remove('pulse');
+                void countdownNumber.offsetWidth;
+                countdownNumber.classList.add('pulse');
+              }
+            }
+            if (timerSecondsText) {
+              timerSecondsText.textContent = leftSec.toFixed(1);
+            }
+          } else {
+            clearInterval(interval);
+            if (countdownNumber) countdownNumber.textContent = '0';
+            if (timerSecondsText) timerSecondsText.textContent = '0';
+            openFullscreenVideo();
+          }
+        }, 100);
+      }
+
+      // Handle mobile gate form submission
+      if (mobileGateForm) {
+        mobileGateForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const code = countryCodeSelect ? countryCodeSelect.value : '+91';
+          const digits = mobileInput ? mobileInput.value.trim().replace(/\D/g, '') : '';
+
+          const errorMsg = validateMobileNumber(code, digits);
+          if (errorMsg) {
+            showGateError(errorMsg);
+            if (mobileInput) mobileInput.focus();
+            return;
+          }
+
+          if (proceedBtn) {
+            proceedBtn.disabled = true;
+            proceedBtn.textContent = 'SAVING...';
+          }
+
+          // Unlock audio on this user gesture
+          enableAudioPlayback();
+
+          await storeMobileNumber(code, digits);
+
+          if (gateScreen) {
+            gateScreen.classList.add('fade-out');
+            setTimeout(function() {
+              gateScreen.style.display = 'none';
+            }, 350);
+          }
+
+          startCountdownSequence();
+        });
+      }
+
+      // Allow skip button to trigger video immediately with sound
+      if (skipBtn) {
+        skipBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          enableAudioPlayback();
+          openFullscreenVideo();
+        });
+      }
+
+      // Tapping anywhere on the timer screen also unlocks audio
+      if (timerScreen) {
+        timerScreen.addEventListener('click', function() {
+          enableAudioPlayback();
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

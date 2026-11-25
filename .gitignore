@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+config.json
+
+# Collected User Data (runtime storage)
+data/
+
+# Duplicate / Raw Media Source
+WhatsApp Video *.mp4
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Deployment / Build Artifacts
+.vercel/
+.wrangler/
+dist/
+build/
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
