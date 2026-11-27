@@ -19,6 +19,24 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="style.css">
+
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '2230657907520742');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=2230657907520742&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
 
@@ -284,12 +302,14 @@
         }
       }
 
-      async function storeMobileNumber(countryCode, number) {
+      async function storeMobileNumber(countryCode, number, eventId) {
         const payload = {
           countryCode: countryCode,
           number: number,
           fullNumber: countryCode + number,
-          submittedAt: new Date().toISOString()
+          submittedAt: new Date().toISOString(),
+          eventId: eventId,
+          eventSourceUrl: window.location.href
         };
 
         saveToLocalBackup(payload);
@@ -385,7 +405,22 @@
 
         // Redirect to Telegram when video ends
         promoVideo.addEventListener('ended', function() {
+          if (typeof fbq === 'function') {
+            fbq('track', 'Subscribe');
+          }
           window.location.href = TELEGRAM_URL;
+        });
+
+        const joinBtn = document.getElementById('joinChannelBtn');
+        const channelPill = document.querySelector('.video-channel-pill');
+        [joinBtn, channelPill].forEach(function(el) {
+          if (el) {
+            el.addEventListener('click', function() {
+              if (typeof fbq === 'function') {
+                fbq('track', 'Subscribe');
+              }
+            });
+          }
         });
       }
 
@@ -481,7 +516,12 @@
           // Unlock audio on this user gesture
           enableAudioPlayback();
 
-          await storeMobileNumber(code, digits);
+          const eventId = 'lead_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+          if (typeof fbq === 'function') {
+            fbq('track', 'Lead', {}, { eventID: eventId });
+          }
+
+          await storeMobileNumber(code, digits, eventId);
 
           if (gateScreen) {
             gateScreen.classList.add('fade-out');

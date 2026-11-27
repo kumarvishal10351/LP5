@@ -1,3 +1,51 @@
+const crypto = require('crypto');
+
+function hashSha256(value) {
+  return crypto.createHash('sha256').update(String(value)).digest('hex');
+}
+
+async function sendToMetaCapi({ pixelId, accessToken, fullNumber, ip, userAgent, eventId, eventSourceUrl }) {
+  if (!pixelId || !accessToken) {
+    return { sent: false, error: 'Missing META_PIXEL_ID or META_CAPI_ACCESS_TOKEN' };
+  }
+
+  const normalizedPhone = String(fullNumber || '').replace(/\D/g, '');
+  const payload = {
+    data: [
+      {
+        event_name: 'Lead',
+        event_time: Math.floor(Date.now() / 1000),
+        event_id: eventId || undefined,
+        event_source_url: eventSourceUrl || undefined,
+        action_source: 'website',
+        user_data: {
+          ph: normalizedPhone ? [hashSha256(normalizedPhone)] : undefined,
+          client_ip_address: ip && ip !== 'unknown' ? ip : undefined,
+          client_user_agent: userAgent || undefined
+        }
+      }
+    ]
+  };
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${encodeURIComponent(pixelId)}/events?access_token=${encodeURIComponent(accessToken)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }
+    );
+    if (res.ok) return { sent: true, error: null };
+    const errText = await res.text();
+    console.error('Meta CAPI error:', res.status, errText);
+    return { sent: false, error: errText };
+  } catch (err) {
+    console.error('Meta CAPI fetch failed:', err);
+    return { sent: false, error: err.message };
+  }
+}
+
 async function readBody(req) {
   if (req.body !== undefined && req.body !== null) {
     if (Buffer.isBuffer(req.body)) {
@@ -29,12 +77,16 @@ async function readBody(req) {
 module.exports = async function handler(req, res) {
   const token = (process.env.TELEGRAM_BOT_TOKEN || '').trim();
   const chatId = (process.env.TELEGRAM_CHAT_ID || '').trim();
+  const metaPixelId = (process.env.META_PIXEL_ID || '2230657907520742').trim();
+  const metaAccessToken = (process.env.META_CAPI_ACCESS_TOKEN || '').trim();
 
   if (req.method === 'GET') {
     return res.status(200).json({
       ok: true,
       hasToken: Boolean(token),
-      hasChatId: Boolean(chatId)
+      hasChatId: Boolean(chatId),
+      hasMetaPixelId: Boolean(metaPixelId),
+      hasMetaCapiToken: Boolean(metaAccessToken)
     });
   }
 
@@ -110,5 +162,21 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  return res.status(201).json({ ok: true, telegramSent, telegramError });
+  const metaResult = await sendToMetaCapi({
+    pixelId: metaPixelId,
+    accessToken: metaAccessToken,
+    fullNumber,
+    ip,
+    userAgent: String(req.headers['user-agent'] || '').slice(0, 300),
+    eventId: body.eventId ? String(body.eventId).slice(0, 100) : '',
+    eventSourceUrl: body.eventSourceUrl ? String(body.eventSourceUrl).slice(0, 500) : (req.headers.referer || '')
+  });
+
+  return res.status(201).json({
+    ok: true,
+    telegramSent,
+    telegramError,
+    metaCapiSent: metaResult.sent,
+    metaCapiError: metaResult.error
+  });
 };

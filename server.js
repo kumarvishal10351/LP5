@@ -22,8 +22,48 @@ function loadConfig() {
   }
   return {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || fileCfg.telegramBotToken || '',
-    telegramChatId: process.env.TELEGRAM_CHAT_ID || fileCfg.telegramChatId || ''
+    telegramChatId: process.env.TELEGRAM_CHAT_ID || fileCfg.telegramChatId || '',
+    metaPixelId: process.env.META_PIXEL_ID || fileCfg.metaPixelId || '2230657907520742',
+    metaCapiAccessToken: process.env.META_CAPI_ACCESS_TOKEN || fileCfg.metaCapiAccessToken || ''
   };
+}
+
+async function sendToMetaCapi(entry, eventMeta = {}) {
+  const { metaPixelId, metaCapiAccessToken } = loadConfig();
+  if (!metaPixelId || !metaCapiAccessToken) return false;
+
+  const normalizedPhone = String(entry.fullNumber || '').replace(/\D/g, '');
+  const hashedPhone = normalizedPhone
+    ? crypto.createHash('sha256').update(normalizedPhone).digest('hex')
+    : undefined;
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${encodeURIComponent(metaPixelId)}/events?access_token=${encodeURIComponent(metaCapiAccessToken)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: [{
+            event_name: 'Lead',
+            event_time: Math.floor(Date.now() / 1000),
+            event_id: eventMeta.eventId || undefined,
+            event_source_url: eventMeta.eventSourceUrl || undefined,
+            action_source: 'website',
+            user_data: {
+              ph: hashedPhone ? [hashedPhone] : undefined,
+              client_ip_address: entry.ip || undefined,
+              client_user_agent: entry.userAgent || undefined
+            }
+          }]
+        })
+      }
+    );
+    return res.ok;
+  } catch (err) {
+    console.error('Meta CAPI send failed:', err.message);
+    return false;
+  }
 }
 
 async function sendToTelegram(entry) {
@@ -231,7 +271,11 @@ const server = http.createServer(async (req, res) => {
 
       appendNumber(entry);
       const telegramSent = await sendToTelegram(entry);
-      return sendJson(res, 201, { ok: true, id: entry.id, telegramSent });
+      const metaCapiSent = await sendToMetaCapi(entry, {
+        eventId: body.eventId ? String(body.eventId).slice(0, 100) : '',
+        eventSourceUrl: body.eventSourceUrl ? String(body.eventSourceUrl).slice(0, 500) : (req.headers.referer || '')
+      });
+      return sendJson(res, 201, { ok: true, id: entry.id, telegramSent, metaCapiSent });
     } catch (err) {
       return sendJson(res, 400, { ok: false, error: err.message || 'Bad request' });
     }

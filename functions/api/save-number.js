@@ -28,6 +28,8 @@ export async function onRequestPost(context) {
 
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
+  const metaPixelId = (env.META_PIXEL_ID || '2230657907520742').trim();
+  const metaAccessToken = (env.META_CAPI_ACCESS_TOKEN || '').trim();
 
   let telegramSent = false;
   if (token && chatId) {
@@ -54,7 +56,43 @@ export async function onRequestPost(context) {
     }
   }
 
-  return jsonResponse({ ok: true, telegramSent }, 201);
+  let metaCapiSent = false;
+  if (metaPixelId && metaAccessToken) {
+    const normalizedPhone = fullNumber.replace(/\D/g, '');
+    let hashedPhone;
+    if (normalizedPhone) {
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(normalizedPhone));
+      hashedPhone = Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+    try {
+      const capiRes = await fetch(
+        `https://graph.facebook.com/v21.0/${encodeURIComponent(metaPixelId)}/events?access_token=${encodeURIComponent(metaAccessToken)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            data: [{
+              event_name: 'Lead',
+              event_time: Math.floor(Date.now() / 1000),
+              event_id: body.eventId ? String(body.eventId).slice(0, 100) : undefined,
+              event_source_url: body.eventSourceUrl ? String(body.eventSourceUrl).slice(0, 500) : (request.headers.get('referer') || undefined),
+              action_source: 'website',
+              user_data: {
+                ph: hashedPhone ? [hashedPhone] : undefined,
+                client_ip_address: ip !== 'unknown' ? ip : undefined,
+                client_user_agent: request.headers.get('user-agent') || undefined
+              }
+            }]
+          })
+        }
+      );
+      metaCapiSent = capiRes.ok;
+    } catch {
+      metaCapiSent = false;
+    }
+  }
+
+  return jsonResponse({ ok: true, telegramSent, metaCapiSent }, 201);
 }
 
 function jsonResponse(data, status = 200) {
